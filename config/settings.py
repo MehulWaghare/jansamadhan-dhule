@@ -1,6 +1,6 @@
 """
 Django settings for config project.
-Production-ready for Render.
+Production-ready for Render + local development.
 """
 
 from pathlib import Path
@@ -16,9 +16,10 @@ SECRET_KEY = os.environ.get(
     "django-insecure-temp-key-change-in-production"
 )
 
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+# ⭐ IMPORTANT: Local True, Render False
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["*"]  # tighten later if needed
+ALLOWED_HOSTS = ["*", "127.0.0.1", "localhost"]
 
 # ================= APPLICATIONS =================
 INSTALLED_APPS = [
@@ -35,7 +36,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # ⭐ WhiteNoise for Render static files
+    # WhiteNoise (safe for both)
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -68,7 +69,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # ================= DATABASE =================
-# SQLite is fine for Render free tier initially
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -100,15 +100,15 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ================= STATIC FILES (CRITICAL FOR RENDER) =================
+# ================= STATIC FILES =================
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ================= MEDIA =================
+# ================= MEDIA FILES (VERY IMPORTANT) =================
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # ================= AUTH =================
 LOGIN_URL = 'login'
