@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero-box text-center">
+
+    <h1 class="fw-bold mb-3">JanSamadhan Dhule</h1>
+    <p class="lead">
+        Dhule Mahanagar Palika Problem Solver Platform
+    </p>
+
+    <div class="mt-4">
+        <img src="https://play-lh.googleusercontent.com/6L4Cphpko5ZaM30G5hcUo1CU-D_HHJ_w8bQ7v9bCSmCDy45tF4dATiY6it4iuxm_oF_K"
+             class="img-fluid rounded shadow"
+             style="max-height:280px;">
+    </div>
+
+    <div class="mt-4">
+        {% if user.is_authenticated %}
+            <a href="{% url 'post_complaint' %}" class="btn btn-light btn-lg">
+                🚨 Report Problem
+            </a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-light btn-lg">
+                Login to Report
+            </a>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

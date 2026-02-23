@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.heatmap-header {
+    background: linear-gradient(135deg, #6610f2, #0dcaf0);
+    color: white;
+    padding: 22px;
+    border-radius: 16px;
+    margin-bottom: 22px;
+    box-shadow: 0 12px 30px rgba(102,16,242,0.35);
+    text-align: center;
+}
+
+.map-card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+}
+</style>
+
+<div class="heatmap-header">
+    <h3 class="fw-bold mb-1">🔥 Dhule Complaint Heatmap</h3>
+    <p class="mb-0 small">
+        Visualizing civic issue hotspots across the city
+    </p>
+</div>
+
+<div class="map-card">
+    <div id="heatmap" style="height: 520px;"></div>
+</div>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Heat plugin -->
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+<script>
+    const heatPoints = {{ heat_data|safe }};
+
+    const map = L.map('heatmap').setView([20.9042, 74.7749], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    if (heatPoints.length > 0) {
+        L.heatLayer(heatPoints, {
+            radius: 25,
+            blur: 20,
+            maxZoom: 17
+        }).addTo(map);
+    }
+</script>
+
+{% endblock %}

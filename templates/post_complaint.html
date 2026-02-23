@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #0d6efd, #00c6ff);
+    color: white;
+    padding: 22px;
+    border-radius: 16px;
+    margin-bottom: 22px;
+    box-shadow: 0 12px 30px rgba(13,110,253,0.35);
+    animation: fadeSlide 0.6s ease;
+}
+
+@keyframes fadeSlide {
+    from {opacity:0; transform: translateY(20px);}
+    to {opacity:1; transform: translateY(0);}
+}
+
+.form-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    padding: 10px;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+}
+
+.map-box {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid #e9ecef;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+}
+
+.submit-btn {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 12px;
+}
+
+@media (max-width: 768px) {
+    .form-card {
+        padding: 16px;
+    }
+}
+</style>
+
+<!-- HEADER -->
+<div class="page-header text-center">
+    <h3 class="fw-bold mb-1">🚨 Register Civic Complaint</h3>
+    <p class="mb-0 small">
+        Help Dhule Mahanagar Palika resolve issues faster
+    </p>
+</div>
+
+<!-- FORM -->
+<div class="form-card">
+<form method="post" enctype="multipart/form-data">
+{% csrf_token %}
+
+<div class="row g-3">
+
+    <!-- TITLE -->
+    <div class="col-md-6">
+        <label class="form-label">Complaint Title</label>
+        {{ form.title }}
+    </div>
+
+    <!-- CATEGORY -->
+    <div class="col-md-6">
+        <label class="form-label">Category</label>
+        {{ form.category }}
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="col-12">
+        <label class="form-label">Problem Description</label>
+        {{ form.description }}
+    </div>
+
+    <!-- IMAGE -->
+    <div class="col-12">
+        <label class="form-label">Upload Proof Image</label>
+        {{ form.image }}
+    </div>
+
+    {{ form.latitude }}
+    {{ form.longitude }}
+    {{ form.address }}
+
+</div>
+
+<!-- MAP -->
+<div class="mt-4">
+    <label class="form-label fw-bold">📍 Select Problem Location</label>
+
+    <div class="map-box">
+        <div id="map" style="height: 380px;"></div>
+    </div>
+
+    <div class="small text-muted mt-2" id="locationStatus">
+        👉 Tap on map to mark exact location
+    </div>
+</div>
+
+<button class="btn btn-danger w-100 mt-4 submit-btn">
+    🚀 Submit Complaint
+</button>
+
+</form>
+</div>
+
+<!-- LEAFLET -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+var map = L.map('map').setView([20.9042, 74.7749], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+}).addTo(map);
+
+var marker;
+
+map.on('click', function(e) {
+    if (marker) map.removeLayer(marker);
+
+    marker = L.marker(e.latlng).addTo(map);
+
+    document.getElementById("id_latitude").value = e.latlng.lat;
+    document.getElementById("id_longitude").value = e.latlng.lng;
+
+    document.getElementById("locationStatus").innerHTML =
+        "⏳ Fetching address...";
+
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("id_address").value = data.display_name;
+        document.getElementById("locationStatus").innerHTML =
+            "✅ Location captured successfully";
+    })
+    .catch(() => {
+        document.getElementById("locationStatus").innerHTML =
+            "⚠️ Location saved";
+    });
+});
+</script>
+
+{% endblock %}

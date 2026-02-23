@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JanSamadhan Dhule</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e3f2fd, #ffffff);
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        /* CARD EFFECT */
+        .card {
+            border-radius: 18px;
+            transition: all 0.35s ease;
+            border: none;
+        }
+
+        .card:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.18);
+        }
+
+        /* HERO */
+        .hero-box {
+            background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+            color: white;
+            padding: 60px 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(13,110,253,0.35);
+            animation: fadeUp 0.9s ease;
+        }
+
+        @keyframes fadeUp {
+            from {opacity:0; transform: translateY(30px);}
+            to {opacity:1; transform: translateY(0);}
+        }
+
+        .btn {
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 6px 10px;
+            border-radius: 20px;
+        }
+
+        .map-container {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        /* MOBILE NAV FIX */
+        @media (max-width: 768px) {
+            .navbar .btn {
+                margin-top: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark bg-dark navbar-expand-lg">
+    <div class="container">
+
+        <a class="navbar-brand fw-bold" href="/">JanSamadhan Dhule</a>
+
+        <!-- Mobile toggle -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-end" id="navMenu">
+            <div class="d-flex flex-wrap align-items-center">
+
+                <!-- Always visible -->
+                <a class="btn btn-outline-light btn-sm me-2" href="{% url 'complaint_list' %}">
+                    📋 Complaints
+                </a>
+
+                <a class="btn btn-outline-info btn-sm me-2" href="{% url 'heatmap' %}">
+                    🔥 Heatmap
+                </a>
+
+                {% if user.is_authenticated %}
+                    <span class="text-white me-2 fw-bold">
+                        👤 {{ user.username }}
+                    </span>
+
+                    <a class="btn btn-success btn-sm me-2" href="{% url 'post_complaint' %}">
+                        ➕ Post
+                    </a>
+
+                    <a class="btn btn-light btn-sm" href="{% url 'logout' %}">
+                        Logout
+                    </a>
+                {% else %}
+                    <a class="btn btn-light btn-sm me-2" href="{% url 'login' %}">
+                        Login
+                    </a>
+                    <a class="btn btn-warning btn-sm" href="{% url 'register' %}">
+                        Register
+                    </a>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- MESSAGES -->
+<div class="container mt-3">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container mt-4">
+    {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
