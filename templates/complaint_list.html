@@ -20,6 +20,7 @@
     border: 1px solid rgba(255,255,255,0.3);
     overflow: hidden;
     position: relative;
+    padding: 18px;
 }
 
 .complaint-card:hover {
@@ -77,7 +78,7 @@
 /* ===== MOBILE ===== */
 @media (max-width: 768px) {
     .complaint-card {
-        padding: 14px !important;
+        padding: 14px;
     }
 
     .action-row {
@@ -91,11 +92,15 @@
 <h2 class="page-title">📋 City Complaints</h2>
 
 {% for c in complaints %}
-<div class="complaint-card mb-4 p-3">
+<div class="complaint-card mb-4">
 
+    <!-- TITLE -->
     <h5 class="fw-bold mb-1">{{ c.title }}</h5>
+
+    <!-- DESCRIPTION -->
     <p class="mb-2 text-muted">{{ c.description }}</p>
 
+    <!-- CATEGORY + STATUS -->
     <div class="mb-2">
         <span class="badge bg-secondary">{{ c.category }}</span>
 
@@ -108,10 +113,14 @@
         {% endif %}
     </div>
 
+    <!-- IMAGE -->
     {% if c.image %}
-        <img src="{{ c.image.url }}" class="complaint-img mb-2">
+        <img src="{{ c.image.url }}"
+             class="complaint-img mb-2"
+             alt="Complaint image">
     {% endif %}
 
+    <!-- ADDRESS -->
     {% if c.address %}
         <p class="text-muted small mb-1">📍 {{ c.address }}</p>
     {% endif %}
@@ -120,23 +129,30 @@
         Posted by <b>{{ c.user.username }}</b> • {{ c.created_at|date:"d M Y, h:i A" }}
     </p>
 
+    <!-- ACTION ROW -->
     <div class="action-row">
 
+        <!-- LIKE BUTTON -->
         <button class="btn btn-outline-danger btn-sm like-btn"
                 data-id="{{ c.id }}">
             ❤️ <span id="like-count-{{ c.id }}">{{ c.likes_count }}</span>
         </button>
 
-        {% if user.is_authenticated and (user == c.user or user.is_superuser) %}
-        <form method="post"
-              action="{% url 'delete_complaint' c.id %}"
-              onsubmit="return confirm('Delete this complaint?');">
-            {% csrf_token %}
-            <button class="btn btn-outline-danger btn-sm">🗑 Delete</button>
-        </form>
+        <!-- ✅ DELETE BUTTON (DJANGO SAFE) -->
+        {% if user.is_authenticated %}
+            {% if user == c.user or user.is_superuser %}
+                <form method="post"
+                      action="{% url 'delete_complaint' c.id %}"
+                      onsubmit="return confirm('Delete this complaint?');">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-danger btn-sm">🗑 Delete</button>
+                </form>
+            {% endif %}
         {% endif %}
+
     </div>
 
+    <!-- COMMENT FORM -->
     {% if user.is_authenticated %}
     <form method="post"
           action="{% url 'add_comment' c.id %}"
@@ -151,6 +167,7 @@
     </form>
     {% endif %}
 
+    <!-- COMMENTS -->
     <div class="mt-3">
         {% for comment in c.comments.all %}
             <div class="border rounded p-2 mb-2 small">
@@ -166,6 +183,7 @@
 <div class="alert alert-info">No complaints yet.</div>
 {% endfor %}
 
+<!-- LIKE SCRIPT -->
 <script>
 document.querySelectorAll('.like-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -173,7 +191,9 @@ document.querySelectorAll('.like-btn').forEach(btn => {
 
         fetch(`/like/${id}/`, {
             method: "POST",
-            headers: { "X-CSRFToken": "{{ csrf_token }}" }
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}"
+            }
         })
         .then(res => res.json())
         .then(data => {
